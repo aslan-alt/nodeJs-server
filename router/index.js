@@ -4,24 +4,10 @@ const path = require('path')
 
 function getFileMime() {
     // const types = require('./mime.json')
-    return new Promise((resolve, reject) => {
-        let string = ''
-        const text = fs.readFileSync('./router/mime.json')
-        text.on('data', (data) => {
-            string += data.toString()
-        })
-        text.on('end', () => {
-            resolve(JSON.parse(string))
-        })
-        text.on('error', (error) => {
-            reject(error)
-        })
-    })
+
+    return JSON.parse(fs.readFileSync('./router/mime.json').toString())
 }
-async function getFileMime2(){
-    const mime = await getFileMime()
-    return  mime
-}
+
 
 exports.static = function (request, response, staticPath) {
     // let query = url.parse(request.url).query //可以通过url模块parse方法拿到url 后面的参数
@@ -30,18 +16,19 @@ exports.static = function (request, response, staticPath) {
     if (pathName !== '/favicon.ico') {
         const extname = path.extname(pathName)//通过path 模块extname拿到后缀类型
 
-        
-        try{
+
+        try {
             const data = fs.readFileSync(staticPath + pathName)
+
             if (data) {
-                const contentType = getFileMime2()
+                const contentType = getFileMime()
                 response.writeHead(200, { 'Content-Type': `${contentType[extname]},charset="utf-8"` });
                 response.end(data);
             }
-        }catch(error){
-            
+        } catch (error) {
+
         }
-        
+
     }
 }
 
